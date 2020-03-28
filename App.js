@@ -1,13 +1,11 @@
-import React, { Component,useState,useEffect } from 'react'
-import { View, TextInput,StyleSheet,Button, } from 'react-native'
+import React, { Component,useState,useEffect } from 'react';
+import { View, TextInput,StyleSheet,Button, } from 'react-native';
 import Sound from 'react-native-sound';
 import YTSearch from 'youtube-api-search';
 import io from 'socket.io-client';
 // import { TextInput } from 'react-native';
 
-
-
-let socket = io("https://konnectapi.herokuapp.com/");
+  let socket = io("https://konnectapi.herokuapp.com/");
     socket.username = "Shreyas";
 
 
@@ -23,7 +21,7 @@ export default function App() {
   const searchYT = term => {
     YTSearch({key: API_KEY,term},videos=>{
       console.log(videos[0].id.videoId);
-      link = videos[0].id.videoId
+      link = videos[0].id.videoId;
     //   track = "http://konnectapi.herokuapp.com/streaming/stream?URL=https://www.youtube.com/watch?v="+link;
     //   track = new Sound(track);
     });
@@ -60,7 +58,7 @@ export default function App() {
         playTrack();
       }
     })
-  });
+  },[track]);
 
   // const [loadedStatusServer,setloadedStatusServer] = useState(0);
 
@@ -111,8 +109,34 @@ export default function App() {
         val1.play();
         console.log(val1);
   }
+
+
+  useEffect(()=>{
+    console.log("done?");
+    socket.on('pause-play-status',(data)=>{
+      if(data.pause ==1 ){
+        console.log("Pause Track");
+        realPause();
+        return;
+      }else if (data.pause == 0){
+        console.log("Resume Track");
+        playTrack();
+        return;
+      }
+    })
+  },[]);
   
+
   pauseTrack =() =>{
+    if(val1._playing){
+    socket.emit( 'pause-play-status',{ 'username':socket.username,'timestamp':new Date(),'pause':'1' } );
+    }else if(!val1._playing){
+      socket.emit( 'pause-play-status',{ 'username':socket.username,'timestamp':new Date(),'pause':'0' } )
+    }
+  }
+
+
+  realPause =() =>{
     val1.pause();
   }
   seekTrack = () =>{
@@ -136,9 +160,9 @@ export default function App() {
 
     </View>
     <Button title="play me" onPress= { playTrack } />
-    <Button title="pause me" onPress={ pauseTrack } />
+    <Button title="pause / Play" onPress={ pauseTrack } />
     <Button title="seek me" onPress={ seekTrack } />
-    <Button title ="undefined" onPress={()=>{socket.emit( 'sync-sound', {'videoid':link,'timestamp':new Date()} )} } />
+    <Button title ="undefined" onPress={()=>{socket.emit( 'sync-sound', {'videoid': link ,'timestamp':new Date()} )} } />
   </View>
   );
 } 
