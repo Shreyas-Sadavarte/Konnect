@@ -17,7 +17,7 @@
     "react": "16.9.0",
     "react-native": "0.61.5",
     "react-native-sound": "^0.11.0",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "socket.io-client": "^2.3.0",
     "use-immer": "^0.3.5",
     "youtube-api-search": "0.0.5"
